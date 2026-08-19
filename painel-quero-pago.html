@@ -19,6 +19,7 @@
     --good: #1F9D67;
     --good-soft: #E1F4EB;
     --warning: #B87503;
+    --warning-soft: #FBEED8;
     --shadow: 0 1px 2px rgba(22,27,38,0.05), 0 10px 28px -14px rgba(22,27,38,0.16);
   }
 
@@ -38,6 +39,7 @@
       --good: #34C98A;
       --good-soft: #143528;
       --warning: #E3A73B;
+      --warning-soft: #3A2C12;
       --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 10px 28px -14px rgba(0,0,0,0.6);
     }
   }
@@ -57,6 +59,7 @@
     --good: #34C98A;
     --good-soft: #143528;
     --warning: #E3A73B;
+    --warning-soft: #3A2C12;
     --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 10px 28px -14px rgba(0,0,0,0.6);
   }
 
@@ -167,16 +170,36 @@
   .tooltip.show { opacity: 1; }
 
   .callout {
-    display: flex; align-items: center; gap: 14px; background: var(--surface-2);
+    display: flex; align-items: flex-start; gap: 14px; background: var(--surface-2);
     border-radius: 12px; padding: 14px 18px; margin-top: 14px; font-size: 13.5px; color: var(--text-muted);
   }
   .callout strong { color: var(--text); }
+  .callout.warning { background: var(--warning-soft); }
+  .callout.warning strong, .callout.warning span:first-child { color: var(--warning); }
+
+  .report-nav {
+    display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap;
+  }
+  .report-nav a {
+    font-size: 13px; font-weight: 600; color: var(--text-muted); text-decoration: none;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 999px;
+    padding: 7px 14px; transition: color .15s, border-color .15s;
+  }
+  .report-nav a:hover { color: var(--accent); border-color: var(--accent); }
+
+  .report-divider {
+    margin-top: 56px; padding-top: 40px; border-top: 2px solid var(--border);
+  }
 
   footer {
     margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border);
     font-size: 12.5px; color: var(--text-faint); display: flex; flex-direction: column; gap: 6px;
   }
   footer a { color: var(--text-muted); }
+  footer code {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 12px;
+    background: var(--surface-2); padding: 1px 5px; border-radius: 4px;
+  }
 
   @media (prefers-reduced-motion: reduce) {
     * { transition: none !important; }
@@ -187,10 +210,21 @@
 
   <header class="top">
     <div class="eyebrow">Operação · Quero Pago</div>
-    <h1>Alunos com painel ativo</h1>
-    <p class="sub">Unialphaville e UniaSP, graduação e pós-graduação — inclui alunos com contrato cancelado ou interrompido. Atualizado diariamente a partir da planilha de origem.</p>
+    <h1>Matriculados sem painel financeiro</h1>
+    <p class="sub">Unialphaville e UniaSP, graduação e pós-graduação — alunos com matrícula confirmada que ainda não têm painel financeiro criado no Quero Pago. Lista operacional para ação de criação de painel. Atualizado diariamente a partir da planilha de origem.</p>
     <div class="meta-row" id="metaRow"></div>
+    <nav class="report-nav">
+      <a href="#sem-painel">↓ Sem painel financeiro</a>
+      <a href="#aptos-rematricula">↓ Aptos à rematrícula</a>
+    </nav>
   </header>
+
+  <section id="sem-painel">
+    <div class="callout warning">
+      <span>⚠</span>
+      <span><strong>Qualidade de dado:</strong> parte desta base pode estar poluída. Alguns alunos aparecem aqui porque o painel foi <strong>interrompido no ADMIN</strong>, mas a matrícula <strong>não foi cancelada no QA</strong> — nesses casos não é de fato um painel faltando ser criado, e sim uma inconsistência de status entre sistemas. Recomenda-se um trabalho de limpeza cruzando status ADMIN × QA antes de qualquer ação operacional em massa sobre esta lista.</span>
+    </div>
+  </section>
 
   <section>
     <div class="kpis" id="kpiRow"></div>
@@ -214,7 +248,7 @@
         <div class="stack-legend" id="levelLegend"></div>
       </div>
       <div class="card">
-        <div class="section-head" style="margin-bottom:16px;"><h2>Origem do painel</h2></div>
+        <div class="section-head" style="margin-bottom:16px;"><h2>Origem da matrícula</h2></div>
         <div class="barlist" id="originList"></div>
       </div>
     </div>
@@ -222,8 +256,8 @@
 
   <section>
     <div class="section-head">
-      <h2>Momentum — últimos 12 meses</h2>
-      <p class="note">painéis criados por mês de matrícula</p>
+      <h2>Evolução — últimos 12 meses</h2>
+      <p class="note">matrículas sem painel identificadas, por mês de matrícula</p>
     </div>
     <div class="card trend-wrap">
       <svg id="trendSvg" viewBox="0 0 1000 220" preserveAspectRatio="none"></svg>
@@ -233,6 +267,10 @@
   </section>
 
   <section>
+    <div class="section-head">
+      <h2>Cursos com mais casos</h2>
+      <p class="note">cursos com mais matrículas sem painel financeiro, por instituição</p>
+    </div>
     <div class="grid-2">
       <div class="card course-col">
         <h3><span class="swatch-lg" style="background:var(--accent)"></span>Cursos — Unialphaville</h3>
@@ -255,11 +293,36 @@
     </div>
   </section>
 
+  <section id="aptos-rematricula" class="report-divider">
+    <div class="eyebrow">Operação · Quero Pago</div>
+    <h1 style="font-size:clamp(24px,3.2vw,32px);">Aptos à rematrícula</h1>
+    <p class="sub">Unialphaville, graduação — alunos em dia com os pagamentos, ainda com semestres/parcelas pela frente, cuja próxima remessa de boletos ainda não foi gerada. Cada linha é uma ação de rematrícula pendente.</p>
+    <div class="meta-row" id="metaRowAptos"></div>
+  </section>
+
+  <section>
+    <div class="kpis" id="kpiRowAptos"></div>
+  </section>
+
+  <section>
+    <div class="grid-2">
+      <div class="card">
+        <div class="section-head" style="margin-bottom:16px;"><h2>Modalidade</h2></div>
+        <div class="barlist" id="aptosModalidadeList"></div>
+      </div>
+      <div class="card">
+        <div class="section-head" style="margin-bottom:16px;"><h2>Status da cobrança</h2></div>
+        <div class="barlist" id="aptosStatusList"></div>
+      </div>
+    </div>
+    <div class="callout" id="aptosCallout"></div>
+  </section>
+
   <footer id="footer"></footer>
 
 </div>
 
-<script id="dash-data" type="application/json">
+<script id="dash-data-sem-painel" type="application/json">
 {
   "total": 913,
   "byUniversity": [
@@ -936,17 +999,68 @@
       48
     ]
   ],
+  "pctComContato": 100,
   "meta": {
-    "generatedAt": "2026-08-19T21:13:34.018Z",
+    "dataset": "sem_painel",
+    "generatedAt": "2026-08-19T21:21:47.681Z",
     "sourceSheetUrl": "https://docs.google.com/spreadsheets/d/175ofeL64-b0G7hlYKqIBkmyN7aYisozAV72v_qykTAM/edit?usp=sharing",
     "rowCount": 913
   }
 }
 </script>
 
+<script id="dash-data-aptos-rematricula" type="application/json">
+{
+  "total": 3,
+  "byUniversity": [
+    [
+      "Unialphaville",
+      3
+    ]
+  ],
+  "byModalidade": [
+    [
+      "A distância (EaD)",
+      3
+    ]
+  ],
+  "byNivel": [
+    [
+      "Graduação",
+      3
+    ]
+  ],
+  "byBillType": [
+    [
+      "installment",
+      3
+    ]
+  ],
+  "byStatus": [
+    [
+      "active",
+      3
+    ]
+  ],
+  "financeiro": {
+    "totalValorCheio": 597,
+    "totalValorVencimento": 230,
+    "ticketMedioCheio": 199,
+    "ticketMedioVencimento": 76.66666666666667
+  },
+  "meta": {
+    "dataset": "aptos_rematricula",
+    "generatedAt": "2026-08-19T21:21:47.757Z",
+    "sourceSheetUrl": "https://docs.google.com/spreadsheets/d/175ofeL64-b0G7hlYKqIBkmyN7aYisozAV72v_qykTAM/edit?usp=sharing",
+    "rowCount": 3
+  }
+}
+</script>
+
 <script>
 (function () {
-  const DATA = JSON.parse(document.getElementById('dash-data').textContent);
+  const DATA = JSON.parse(document.getElementById('dash-data-sem-painel').textContent);
+  const APTOS = JSON.parse(document.getElementById('dash-data-aptos-rematricula').textContent);
   const fmt = (n) => new Intl.NumberFormat('pt-BR').format(n);
   const fmtMoney = (n) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n);
   const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -968,14 +1082,13 @@
   `;
 
   // --- KPIs ---
-  const totalReceita = (DATA.ticketUnialphaville.totalCom || 0) + (DATA.ticketUniaSP.totalCom || 0);
   const posCount = (DATA.byNivelSimplificado.find(([k]) => k === 'Pós-graduação') || [null, 0])[1];
   const posPct = ((posCount / DATA.total) * 100).toFixed(0);
   const kpis = [
-    { label: 'Alunos com painel', value: fmt(DATA.total), sub: 'Unialphaville + UniaSP, todos os status' },
+    { label: 'Matriculados sem painel', value: fmt(DATA.total), sub: 'Unialphaville + UniaSP' },
     { label: 'Desde jan/2026', value: fmt(DATA.total2026), sub: `${DATA.byUniversity2026.map(([k,v]) => k+' '+v).join(' · ')}` },
-    { label: 'Pós-graduação', value: posPct + '%', sub: `${fmt(posCount)} de ${fmt(DATA.total)} painéis` },
-    { label: 'Mensalidade vigente (soma)', value: fmtMoney(totalReceita), sub: 'valor com desconto, base atual' },
+    { label: 'Pós-graduação', value: posPct + '%', sub: `${fmt(posCount)} de ${fmt(DATA.total)} casos` },
+    { label: 'Com contato para ação', value: (DATA.pctComContato ?? 0) + '%', sub: 'telefone, whatsapp ou e-mail disponível' },
   ];
   document.getElementById('kpiRow').innerHTML = kpis.map(k => `
     <div class="kpi">
@@ -1109,10 +1222,47 @@
   document.getElementById('historyCallout').innerHTML =
     `<span>ⓘ</span><span><strong>${fmt(y2022)} registros são de 2022</strong> — ${((y2022/DATA.total)*100).toFixed(0)}% da base histórica. Provável carga retroativa de migração, não pico real de captação; não usar 2022 como referência de sazonalidade.</span>`;
 
+  // ============ Aptos à rematrícula (segunda planilha) ============
+  const aptosGenerated = new Date(APTOS.meta.generatedAt);
+  document.getElementById('metaRowAptos').innerHTML = `
+    <span class="pill">${fmt(APTOS.meta.rowCount)} registros</span>
+    <span class="pill">Fonte: <a href="${APTOS.meta.sourceSheetUrl}" target="_blank" rel="noopener">Google Sheets</a>, aba aptos_rematricula</span>
+    <span class="pill">Gerado ${aptosGenerated.toLocaleString('pt-BR', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' })}</span>
+  `;
+
+  const aptosKpis = [
+    { label: 'Aptos à rematrícula', value: fmt(APTOS.total), sub: 'Unialphaville, graduação' },
+    { label: 'Valor da próxima remessa', value: fmtMoney(APTOS.financeiro.totalValorVencimento), sub: 'soma do valor no vencimento' },
+    { label: 'Ticket médio', value: fmtMoney(APTOS.financeiro.ticketMedioVencimento), sub: 'por aluno, valor no vencimento' },
+  ];
+  document.getElementById('kpiRowAptos').innerHTML = aptosKpis.map(k => `
+    <div class="kpi">
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value tabnum">${k.value}</div>
+      <div class="kpi-sub">${k.sub}</div>
+    </div>`).join('');
+
+  const renderBarlist = (id, rows, variant) => {
+    const max = Math.max(...rows.map(([, v]) => v), 1);
+    document.getElementById(id).innerHTML = rows.length ? rows.map(([name, v]) => `
+      <div class="barlist-row">
+        <div class="barlist-label">${name}</div>
+        <div class="barlist-track"><div class="barlist-fill${variant ? ' ' + variant : ''}" style="width:${(v/max)*100}%" title="${name}: ${fmt(v)}"></div></div>
+        <div class="barlist-value tabnum">${fmt(v)}</div>
+      </div>`).join('') : `<p class="note">Sem dados no momento.</p>`;
+  };
+  renderBarlist('aptosModalidadeList', APTOS.byModalidade);
+  renderBarlist('aptosStatusList', APTOS.byStatus, 'accent2');
+
+  document.getElementById('aptosCallout').innerHTML = APTOS.total > 0
+    ? `<span>ℹ</span><span>Lista enxuta hoje (<strong>${fmt(APTOS.total)} caso${APTOS.total === 1 ? '' : 's'}</strong>) — tende a crescer perto do início do próximo período letivo, quando mais alunos se aproximam do fim das parcelas atuais.</span>`
+    : `<span>ℹ</span><span>Nenhum aluno apto à rematrícula no momento.</span>`;
+
   // --- footer ---
   document.getElementById('footer').innerHTML = `
-    <span>Fonte dos dados: <a href="${DATA.meta.sourceSheetUrl}" target="_blank" rel="noopener">planilha Google Sheets</a> alimentada por query de notebook Databricks. Gerado em ${generated.toLocaleString('pt-BR')}.</span>
-    <span>Este painel mostra apenas dados agregados — nenhum CPF, e-mail, telefone ou nome individual é exibido aqui.</span>
+    <span>Fonte dos dados: <a href="${DATA.meta.sourceSheetUrl}" target="_blank" rel="noopener">planilha Google Sheets</a> (abas <code>sem_painel</code> e <code>aptos_rematricula</code>), alimentada por queries de notebook Databricks. "Sem painel" gerado em ${generated.toLocaleString('pt-BR')}; "Aptos à rematrícula" gerado em ${aptosGenerated.toLocaleString('pt-BR')}.</span>
+    <span>Ambos os relatórios mostram apenas dados agregados — nenhum CPF, e-mail, telefone ou nome individual é exibido aqui, mesmo a planilha de origem tendo essas colunas para ação operacional.</span>
+    <span>Pipeline e metodologia: <a href="https://github.com/fortunatoBruna/qp_marcas" target="_blank" rel="noopener">github.com/fortunatoBruna/qp_marcas</a></span>
   `;
 })();
 </script>

@@ -12,6 +12,9 @@ const iValorSem = idx('valor_sem_desconto');
 const iValorCom = idx('valor_com_desconto');
 const iOrigin = idx('origin');
 const iSemester = idx('enrollment_semester');
+const iPhone = idx('phone');
+const iWhatsapp = idx('whatsapp');
+const iEmail = idx('email');
 
 function num(v) { const n = parseFloat(v); return isNaN(n) ? 0 : n; }
 
@@ -110,7 +113,16 @@ for (let i = 11; i >= 0; i--) {
 }
 out.last12Months = last12;
 
+// % de linhas com pelo menos um canal de contato preenchido (metrica agregada, sem expor os valores)
+{
+  const comContato = data.filter(r =>
+    (r[iPhone] || '').trim() || (r[iWhatsapp] || '').trim() || (r[iEmail] || '').trim()
+  ).length;
+  out.pctComContato = data.length ? Math.round((comContato / data.length) * 100) : 0;
+}
+
 out.meta = {
+  dataset: 'sem_painel',
   generatedAt: new Date().toISOString(),
   sourceSheetUrl: 'https://docs.google.com/spreadsheets/d/175ofeL64-b0G7hlYKqIBkmyN7aYisozAV72v_qykTAM/edit?usp=sharing',
   rowCount: data.length,
