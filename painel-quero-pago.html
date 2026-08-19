@@ -1,0 +1,1118 @@
+<title>Painel Quero Pago</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Source+Sans+3:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #F3F5FA;
+    --surface: #FFFFFF;
+    --surface-2: #EEF1FD;
+    --border: #E1E4EC;
+    --text: #161B26;
+    --text-muted: #5B6472;
+    --text-faint: #6B7280;
+    --accent: #3454D1;
+    --accent-soft: #DEE5FB;
+    --accent-2: #0E9384;
+    --accent-2-soft: #D9F0EC;
+    --good: #1F9D67;
+    --good-soft: #E1F4EB;
+    --warning: #B87503;
+    --shadow: 0 1px 2px rgba(22,27,38,0.05), 0 10px 28px -14px rgba(22,27,38,0.16);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12141B;
+      --surface: #1A1D26;
+      --surface-2: #212A45;
+      --border: #2B2F3C;
+      --text: #EDEFF4;
+      --text-muted: #9AA2B1;
+      --text-faint: #6B7280;
+      --accent: #7C93F5;
+      --accent-soft: #232B4C;
+      --accent-2: #35BBA1;
+      --accent-2-soft: #143530;
+      --good: #34C98A;
+      --good-soft: #143528;
+      --warning: #E3A73B;
+      --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 10px 28px -14px rgba(0,0,0,0.6);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #12141B;
+    --surface: #1A1D26;
+    --surface-2: #212A45;
+    --border: #2B2F3C;
+    --text: #EDEFF4;
+    --text-muted: #9AA2B1;
+    --text-faint: #6B7280;
+    --accent: #7C93F5;
+    --accent-soft: #232B4C;
+    --accent-2: #35BBA1;
+    --accent-2-soft: #143530;
+    --good: #34C98A;
+    --good-soft: #143528;
+    --warning: #E3A73B;
+    --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 10px 28px -14px rgba(0,0,0,0.6);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, .eyebrow, .stat-value, .num {
+    font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  }
+  .mono, .tabnum {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 40px 24px 64px; }
+
+  header.top { margin-bottom: 32px; }
+  .eyebrow {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 10px;
+  }
+  h1 {
+    font-size: clamp(28px, 4vw, 38px); font-weight: 800; margin: 0 0 8px;
+    letter-spacing: -0.01em; text-wrap: balance;
+  }
+  .sub { color: var(--text-muted); font-size: 16px; max-width: 62ch; margin: 0 0 20px; }
+
+  .meta-row {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+  }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 999px; padding: 6px 12px; font-size: 13px; color: var(--text-muted);
+  }
+  .pill.good { background: var(--good-soft); border-color: transparent; color: var(--good); font-weight: 600; }
+  .pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--good); flex: none; }
+  .pill a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+
+  section { margin-top: 36px; }
+  .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 14px; flex-wrap: wrap; }
+  h2 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin: 0; }
+  .note { font-size: 13px; color: var(--text-faint); margin: 0; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    box-shadow: var(--shadow); padding: 22px 24px;
+  }
+
+  /* KPI row */
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; box-shadow: var(--shadow); }
+  .kpi-label { font-size: 12.5px; color: var(--text-muted); margin-bottom: 8px; }
+  .kpi-value { font-size: 30px; font-weight: 800; letter-spacing: -0.01em; }
+  .kpi-sub { font-size: 12.5px; color: var(--text-faint); margin-top: 4px; }
+  @media (max-width: 860px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 860px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* Stacked composition bar */
+  .stack-bar { display: flex; height: 34px; border-radius: 8px; overflow: hidden; background: var(--border); }
+  .stack-seg { display: flex; align-items: center; justify-content: center; color: white; font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; transition: filter .15s; }
+  .stack-seg:hover { filter: brightness(1.08); }
+  .stack-legend { display: flex; gap: 18px; margin-top: 12px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--text-muted); }
+  .swatch { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+
+  /* Horizontal bar lists */
+  .barlist { display: flex; flex-direction: column; gap: 9px; }
+  .barlist-row { display: grid; grid-template-columns: 84px 1fr 46px; align-items: center; gap: 10px; }
+  .barlist-label { font-size: 13px; color: var(--text-muted); text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .barlist-track { background: var(--surface-2); border-radius: 6px; height: 20px; position: relative; }
+  .barlist-fill { background: var(--accent); height: 100%; border-radius: 6px; transition: filter .15s; }
+  .barlist-fill:hover { filter: brightness(1.12); }
+  .barlist-fill.accent2 { background: var(--accent-2); }
+  .barlist-value { font-size: 13px; color: var(--text); text-align: right; }
+
+  /* course lists */
+  .course-col h3 { font-size: 15px; font-weight: 700; margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+  .course-col .swatch-lg { width: 12px; height: 12px; border-radius: 4px; }
+  .course-list { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 0; }
+  .course-list li {
+    display: flex; justify-content: space-between; gap: 12px; padding: 9px 0;
+    border-bottom: 1px solid var(--border); font-size: 13.5px;
+  }
+  .course-list li:last-child { border-bottom: none; }
+  .course-list .n { color: var(--text-faint); }
+  .course-list .v { font-weight: 600; }
+
+  /* trend chart */
+  .trend-wrap { position: relative; }
+  #trendSvg { width: 100%; height: 220px; display: block; overflow: visible; }
+  .axis-label { font-size: 11px; fill: var(--text-faint); font-family: "IBM Plex Mono", monospace; }
+  .tooltip {
+    position: absolute; pointer-events: none; background: var(--text); color: var(--bg);
+    font-size: 12.5px; padding: 6px 10px; border-radius: 8px; transform: translate(-50%, -120%);
+    white-space: nowrap; opacity: 0; transition: opacity .1s; font-family: "IBM Plex Mono", monospace;
+    z-index: 5;
+  }
+  .tooltip.show { opacity: 1; }
+
+  .callout {
+    display: flex; align-items: center; gap: 14px; background: var(--surface-2);
+    border-radius: 12px; padding: 14px 18px; margin-top: 14px; font-size: 13.5px; color: var(--text-muted);
+  }
+  .callout strong { color: var(--text); }
+
+  footer {
+    margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border);
+    font-size: 12.5px; color: var(--text-faint); display: flex; flex-direction: column; gap: 6px;
+  }
+  footer a { color: var(--text-muted); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="top">
+    <div class="eyebrow">Operação · Quero Pago</div>
+    <h1>Alunos com painel ativo</h1>
+    <p class="sub">Unialphaville e UniaSP, graduação e pós-graduação — inclui alunos com contrato cancelado ou interrompido. Atualizado diariamente a partir da planilha de origem.</p>
+    <div class="meta-row" id="metaRow"></div>
+  </header>
+
+  <section>
+    <div class="kpis" id="kpiRow"></div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Distribuição por instituição</h2>
+    </div>
+    <div class="card">
+      <div class="stack-bar" id="univStack"></div>
+      <div class="stack-legend" id="univLegend"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="grid-2">
+      <div class="card">
+        <div class="section-head" style="margin-bottom:16px;"><h2>Nível de ensino</h2></div>
+        <div class="stack-bar" id="levelStack"></div>
+        <div class="stack-legend" id="levelLegend"></div>
+      </div>
+      <div class="card">
+        <div class="section-head" style="margin-bottom:16px;"><h2>Origem do painel</h2></div>
+        <div class="barlist" id="originList"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Momentum — últimos 12 meses</h2>
+      <p class="note">painéis criados por mês de matrícula</p>
+    </div>
+    <div class="card trend-wrap">
+      <svg id="trendSvg" viewBox="0 0 1000 220" preserveAspectRatio="none"></svg>
+      <div class="tooltip" id="trendTooltip"></div>
+    </div>
+    <div class="callout" id="historyCallout"></div>
+  </section>
+
+  <section>
+    <div class="grid-2">
+      <div class="card course-col">
+        <h3><span class="swatch-lg" style="background:var(--accent)"></span>Cursos — Unialphaville</h3>
+        <ul class="course-list" id="courseUnia"></ul>
+      </div>
+      <div class="card course-col">
+        <h3><span class="swatch-lg" style="background:var(--accent-2)"></span>Cursos — UniaSP</h3>
+        <ul class="course-list" id="courseUniasp"></ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Distribuição geográfica</h2>
+      <p class="note">campus físico do aluno — maioria é EaD, sem campus associado</p>
+    </div>
+    <div class="card">
+      <div class="barlist" id="geoList"></div>
+    </div>
+  </section>
+
+  <footer id="footer"></footer>
+
+</div>
+
+<script id="dash-data" type="application/json">
+{
+  "total": 913,
+  "byUniversity": [
+    [
+      "Unialphaville",
+      844
+    ],
+    [
+      "UniaSP",
+      69
+    ]
+  ],
+  "byLevel": [
+    [
+      "Especialização (pós-graduação)",
+      763
+    ],
+    [
+      "MBA (pós-graduação)",
+      92
+    ],
+    [
+      "Bacharelado (graduação)",
+      30
+    ],
+    [
+      "Tecnólogo (graduação)",
+      26
+    ],
+    [
+      "Licenciatura (graduação)",
+      2
+    ]
+  ],
+  "byCampusState": [
+    [
+      "Não informado / EaD",
+      616
+    ],
+    [
+      "SP",
+      132
+    ],
+    [
+      "RJ",
+      22
+    ],
+    [
+      "MG",
+      18
+    ],
+    [
+      "RS",
+      16
+    ],
+    [
+      "PR",
+      12
+    ],
+    [
+      "DF",
+      11
+    ],
+    [
+      "PE",
+      10
+    ],
+    [
+      "BA",
+      9
+    ],
+    [
+      "SC",
+      9
+    ],
+    [
+      "GO",
+      9
+    ],
+    [
+      "AM",
+      8
+    ],
+    [
+      "PI",
+      5
+    ],
+    [
+      "PA",
+      5
+    ],
+    [
+      "MS",
+      4
+    ],
+    [
+      "SE",
+      4
+    ],
+    [
+      "MA",
+      4
+    ],
+    [
+      "PB",
+      3
+    ],
+    [
+      "CE",
+      3
+    ],
+    [
+      "RN",
+      3
+    ],
+    [
+      "ES",
+      3
+    ],
+    [
+      "AL",
+      2
+    ],
+    [
+      "RO",
+      2
+    ],
+    [
+      "MT",
+      1
+    ],
+    [
+      "AC",
+      1
+    ],
+    [
+      "AP",
+      1
+    ]
+  ],
+  "geoTop": {
+    "top": [
+      [
+        "SP",
+        132
+      ],
+      [
+        "RJ",
+        22
+      ],
+      [
+        "MG",
+        18
+      ],
+      [
+        "RS",
+        16
+      ],
+      [
+        "PR",
+        12
+      ],
+      [
+        "DF",
+        11
+      ],
+      [
+        "PE",
+        10
+      ],
+      [
+        "BA",
+        9
+      ]
+    ],
+    "outrosEstados": 67,
+    "naoInformadoEad": 616
+  },
+  "byOrigin": [
+    [
+      "Quero Bolsa",
+      845
+    ],
+    [
+      "APP",
+      21
+    ],
+    [
+      "Unialphaville",
+      20
+    ],
+    [
+      "EAD",
+      17
+    ],
+    [
+      "OPA",
+      6
+    ],
+    [
+      "Skola",
+      3
+    ],
+    [
+      "UniaSP",
+      1
+    ]
+  ],
+  "byNivelSimplificado": [
+    [
+      "Pós-graduação",
+      855
+    ],
+    [
+      "Graduação",
+      58
+    ]
+  ],
+  "byYear": [
+    [
+      "2018",
+      23
+    ],
+    [
+      "2019",
+      21
+    ],
+    [
+      "2020",
+      2
+    ],
+    [
+      "2021",
+      1
+    ],
+    [
+      "2022",
+      597
+    ],
+    [
+      "2023",
+      37
+    ],
+    [
+      "2024",
+      33
+    ],
+    [
+      "2025",
+      93
+    ],
+    [
+      "2026",
+      106
+    ]
+  ],
+  "byMonth": [
+    [
+      "2018-04",
+      1
+    ],
+    [
+      "2018-05",
+      3
+    ],
+    [
+      "2018-06",
+      1
+    ],
+    [
+      "2018-07",
+      13
+    ],
+    [
+      "2018-08",
+      2
+    ],
+    [
+      "2018-09",
+      1
+    ],
+    [
+      "2018-11",
+      2
+    ],
+    [
+      "2019-01",
+      5
+    ],
+    [
+      "2019-02",
+      1
+    ],
+    [
+      "2019-03",
+      2
+    ],
+    [
+      "2019-04",
+      4
+    ],
+    [
+      "2019-05",
+      3
+    ],
+    [
+      "2019-06",
+      1
+    ],
+    [
+      "2019-07",
+      1
+    ],
+    [
+      "2019-08",
+      3
+    ],
+    [
+      "2019-09",
+      1
+    ],
+    [
+      "2020-09",
+      1
+    ],
+    [
+      "2020-11",
+      1
+    ],
+    [
+      "2021-02",
+      1
+    ],
+    [
+      "2022-04",
+      1
+    ],
+    [
+      "2022-05",
+      24
+    ],
+    [
+      "2022-06",
+      104
+    ],
+    [
+      "2022-07",
+      35
+    ],
+    [
+      "2022-08",
+      35
+    ],
+    [
+      "2022-09",
+      31
+    ],
+    [
+      "2022-10",
+      56
+    ],
+    [
+      "2022-11",
+      165
+    ],
+    [
+      "2022-12",
+      146
+    ],
+    [
+      "2023-01",
+      13
+    ],
+    [
+      "2023-02",
+      2
+    ],
+    [
+      "2023-03",
+      3
+    ],
+    [
+      "2023-04",
+      2
+    ],
+    [
+      "2023-07",
+      1
+    ],
+    [
+      "2023-09",
+      4
+    ],
+    [
+      "2023-10",
+      6
+    ],
+    [
+      "2023-11",
+      5
+    ],
+    [
+      "2023-12",
+      1
+    ],
+    [
+      "2024-01",
+      1
+    ],
+    [
+      "2024-02",
+      3
+    ],
+    [
+      "2024-03",
+      3
+    ],
+    [
+      "2024-04",
+      4
+    ],
+    [
+      "2024-05",
+      9
+    ],
+    [
+      "2024-06",
+      3
+    ],
+    [
+      "2024-07",
+      2
+    ],
+    [
+      "2024-08",
+      2
+    ],
+    [
+      "2024-09",
+      4
+    ],
+    [
+      "2024-10",
+      1
+    ],
+    [
+      "2024-11",
+      1
+    ],
+    [
+      "2025-01",
+      6
+    ],
+    [
+      "2025-02",
+      5
+    ],
+    [
+      "2025-03",
+      8
+    ],
+    [
+      "2025-04",
+      14
+    ],
+    [
+      "2025-05",
+      26
+    ],
+    [
+      "2025-06",
+      23
+    ],
+    [
+      "2025-07",
+      1
+    ],
+    [
+      "2025-08",
+      2
+    ],
+    [
+      "2025-09",
+      3
+    ],
+    [
+      "2025-10",
+      1
+    ],
+    [
+      "2025-11",
+      3
+    ],
+    [
+      "2025-12",
+      1
+    ],
+    [
+      "2026-01",
+      37
+    ],
+    [
+      "2026-02",
+      8
+    ],
+    [
+      "2026-03",
+      4
+    ],
+    [
+      "2026-06",
+      2
+    ],
+    [
+      "2026-07",
+      7
+    ],
+    [
+      "2026-08",
+      48
+    ]
+  ],
+  "topCursosUnialphaville": [
+    [
+      "Engenharia de Segurança do Trabalho",
+      31
+    ],
+    [
+      "Gestão de Recursos Humanos",
+      30
+    ],
+    [
+      "Administração",
+      30
+    ],
+    [
+      "MBA em Gestão de Departamento Pessoal e Relações Trabalhistas",
+      18
+    ],
+    [
+      "Docência no Ensino Superior",
+      15
+    ],
+    [
+      "MBA em Gestão de Pessoas e Liderança",
+      12
+    ],
+    [
+      "Psicologia Organizacional",
+      9
+    ],
+    [
+      "Psicanálise",
+      9
+    ]
+  ],
+  "topCursosUniaSP": [
+    [
+      "Engenharia de Segurança do Trabalho",
+      4
+    ],
+    [
+      "Psicopedagogia",
+      3
+    ],
+    [
+      "Odontologia em Saúde Coletiva",
+      3
+    ],
+    [
+      "Farmácia Estética",
+      2
+    ],
+    [
+      "Biomedicina Estética",
+      2
+    ],
+    [
+      "Neuropsicopedagogia e Psicanálise Clínica",
+      2
+    ],
+    [
+      "MBA em Gestão Comercial e Vendas",
+      2
+    ],
+    [
+      "Enfermagem em Ginecologia e Obstetrícia",
+      1
+    ]
+  ],
+  "ticketUnialphaville": {
+    "n": 844,
+    "avgSem": 130.93510663507126,
+    "avgCom": 43.638886255924646,
+    "totalCom": 36831.2200000004
+  },
+  "ticketUniaSP": {
+    "n": 69,
+    "avgSem": 311.1163768115934,
+    "avgCom": 65.58666666666667,
+    "totalCom": 4525.4800000000005
+  },
+  "total2026": 106,
+  "byUniversity2026": [
+    [
+      "Unialphaville",
+      73
+    ],
+    [
+      "UniaSP",
+      33
+    ]
+  ],
+  "byNivelSimplificado2026": [
+    [
+      "Pós-graduação",
+      102
+    ],
+    [
+      "Graduação",
+      4
+    ]
+  ],
+  "minDate": "2018-04-13 13:15:47.574776",
+  "maxDate": "2026-08-14 15:05:22.478440",
+  "generatedFromRows": 913,
+  "last12Months": [
+    [
+      "2025-09",
+      3
+    ],
+    [
+      "2025-10",
+      1
+    ],
+    [
+      "2025-11",
+      3
+    ],
+    [
+      "2025-12",
+      1
+    ],
+    [
+      "2026-01",
+      37
+    ],
+    [
+      "2026-02",
+      8
+    ],
+    [
+      "2026-03",
+      4
+    ],
+    [
+      "2026-04",
+      0
+    ],
+    [
+      "2026-05",
+      0
+    ],
+    [
+      "2026-06",
+      2
+    ],
+    [
+      "2026-07",
+      7
+    ],
+    [
+      "2026-08",
+      48
+    ]
+  ],
+  "meta": {
+    "generatedAt": "2026-08-19T20:21:14.247Z",
+    "sourceSheetUrl": "https://docs.google.com/spreadsheets/d/175ofeL64-b0G7hlYKqIBkmyN7aYisozAV72v_qykTAM/edit?usp=sharing",
+    "rowCount": 913
+  }
+}
+</script>
+
+<script>
+(function () {
+  const DATA = JSON.parse(document.getElementById('dash-data').textContent);
+  const fmt = (n) => new Intl.NumberFormat('pt-BR').format(n);
+  const fmtMoney = (n) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n);
+  const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
+  const totalUniv = DATA.byUniversity.reduce((s, [, v]) => s + v, 0);
+  const monthLabels = { '01':'jan','02':'fev','03':'mar','04':'abr','05':'mai','06':'jun','07':'jul','08':'ago','09':'set','10':'out','11':'nov','12':'dez' };
+  const fmtMonth = (key) => { const [y, m] = key.split('-'); return monthLabels[m] + '/' + y.slice(2); };
+
+  // --- meta row ---
+  const generated = new Date(DATA.meta.generatedAt);
+  const ageHours = (Date.now() - generated.getTime()) / 36e5;
+  const fresh = ageHours < 30;
+  const metaRow = document.getElementById('metaRow');
+  metaRow.innerHTML = `
+    <span class="pill ${fresh ? 'good' : ''}"><span class="dot"></span>${fresh ? 'Atualizado' : 'Desatualizado'} · ${generated.toLocaleString('pt-BR', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' })}</span>
+    <span class="pill">${fmt(DATA.meta.rowCount)} registros</span>
+    <span class="pill">Fonte: <a href="${DATA.meta.sourceSheetUrl}" target="_blank" rel="noopener">Google Sheets</a></span>
+    <span class="pill">Janela: ${DATA.minDate.slice(0,10)} → ${DATA.maxDate.slice(0,10)}</span>
+  `;
+
+  // --- KPIs ---
+  const totalReceita = (DATA.ticketUnialphaville.totalCom || 0) + (DATA.ticketUniaSP.totalCom || 0);
+  const posCount = (DATA.byNivelSimplificado.find(([k]) => k === 'Pós-graduação') || [null, 0])[1];
+  const posPct = ((posCount / DATA.total) * 100).toFixed(0);
+  const kpis = [
+    { label: 'Alunos com painel', value: fmt(DATA.total), sub: 'Unialphaville + UniaSP, todos os status' },
+    { label: 'Desde jan/2026', value: fmt(DATA.total2026), sub: `${DATA.byUniversity2026.map(([k,v]) => k+' '+v).join(' · ')}` },
+    { label: 'Pós-graduação', value: posPct + '%', sub: `${fmt(posCount)} de ${fmt(DATA.total)} painéis` },
+    { label: 'Mensalidade vigente (soma)', value: fmtMoney(totalReceita), sub: 'valor com desconto, base atual' },
+  ];
+  document.getElementById('kpiRow').innerHTML = kpis.map(k => `
+    <div class="kpi">
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value tabnum">${k.value}</div>
+      <div class="kpi-sub">${k.sub}</div>
+    </div>`).join('');
+
+  // --- university stacked bar ---
+  const univColors = { 'Unialphaville': css('--accent'), 'UniaSP': css('--accent-2') };
+  const univStack = document.getElementById('univStack');
+  univStack.innerHTML = DATA.byUniversity.map(([name, v]) => {
+    const pct = (v / totalUniv) * 100;
+    return `<div class="stack-seg" style="width:${pct}%;background:${univColors[name] || css('--text-faint')}" title="${name}: ${fmt(v)} (${pct.toFixed(1)}%)">${pct > 8 ? fmt(v) : ''}</div>`;
+  }).join('');
+  document.getElementById('univLegend').innerHTML = DATA.byUniversity.map(([name, v]) => `
+    <div class="legend-item"><span class="swatch" style="background:${univColors[name]}"></span>${name} — ${fmt(v)} (${((v/totalUniv)*100).toFixed(1)}%)</div>
+  `).join('');
+
+  // --- level stacked bar (magnitude, single hue duotone) ---
+  const levelData = DATA.byNivelSimplificado.filter(([k]) => k !== 'Outro');
+  const levelTotal = levelData.reduce((s, [, v]) => s + v, 0);
+  const levelStack = document.getElementById('levelStack');
+  levelStack.innerHTML = levelData.map(([name, v], i) => {
+    const pct = (v / levelTotal) * 100;
+    const color = i === 0 ? css('--accent') : css('--accent-soft');
+    const textColor = i === 0 ? '#fff' : css('--text');
+    return `<div class="stack-seg" style="width:${pct}%;background:${color};color:${textColor}" title="${name}: ${fmt(v)} (${pct.toFixed(1)}%)">${pct > 10 ? fmt(v) : ''}</div>`;
+  }).join('');
+  document.getElementById('levelLegend').innerHTML = levelData.map(([name, v], i) => `
+    <div class="legend-item"><span class="swatch" style="background:${i === 0 ? css('--accent') : css('--accent-soft')}"></span>${name} — ${fmt(v)} (${((v/levelTotal)*100).toFixed(1)}%)</div>
+  `).join('');
+
+  // --- origin barlist ---
+  const originMax = Math.max(...DATA.byOrigin.map(([, v]) => v));
+  document.getElementById('originList').innerHTML = DATA.byOrigin.map(([name, v]) => `
+    <div class="barlist-row">
+      <div class="barlist-label">${name}</div>
+      <div class="barlist-track"><div class="barlist-fill" style="width:${(v/originMax)*100}%" title="${name}: ${fmt(v)}"></div></div>
+      <div class="barlist-value tabnum">${fmt(v)}</div>
+    </div>
+  `).join('');
+
+  // --- course lists ---
+  const renderCourses = (id, list) => {
+    document.getElementById(id).innerHTML = list.map(([name, v]) => `
+      <li><span>${name}</span><span class="v tabnum">${fmt(v)}</span></li>
+    `).join('');
+  };
+  renderCourses('courseUnia', DATA.topCursosUnialphaville);
+  renderCourses('courseUniasp', DATA.topCursosUniaSP);
+
+  // --- geo barlist (top 8 + outros + não informado) ---
+  const geoRows = [...DATA.geoTop.top];
+  const geoMax = Math.max(...geoRows.map(([, v]) => v), DATA.geoTop.outrosEstados);
+  let geoHtml = geoRows.map(([name, v]) => `
+    <div class="barlist-row">
+      <div class="barlist-label">${name}</div>
+      <div class="barlist-track"><div class="barlist-fill accent2" style="width:${(v/geoMax)*100}%" title="${name}: ${fmt(v)}"></div></div>
+      <div class="barlist-value tabnum">${fmt(v)}</div>
+    </div>`).join('');
+  geoHtml += `
+    <div class="barlist-row">
+      <div class="barlist-label">Outros estados</div>
+      <div class="barlist-track"><div class="barlist-fill accent2" style="width:${(DATA.geoTop.outrosEstados/geoMax)*100}%" title="Outros estados: ${fmt(DATA.geoTop.outrosEstados)}"></div></div>
+      <div class="barlist-value tabnum">${fmt(DATA.geoTop.outrosEstados)}</div>
+    </div>`;
+  document.getElementById('geoList').innerHTML = geoHtml;
+  document.querySelector('section:last-of-type .note') && (document.querySelector('section:last-of-type .note').textContent += ` — ${fmt(DATA.geoTop.naoInformadoEad)} sem campus físico (EaD) não incluídos no gráfico acima`);
+
+  // --- trend chart ---
+  const svg = document.getElementById('trendSvg');
+  const tooltip = document.getElementById('trendTooltip');
+  const W = 1000, H = 220, padL = 8, padR = 8, padT = 16, padB = 28;
+  const months = DATA.last12Months;
+  const maxV = Math.max(...months.map(([, v]) => v), 1);
+  const stepX = (W - padL - padR) / (months.length - 1);
+  const yOf = (v) => padT + (1 - v / maxV) * (H - padT - padB);
+  const points = months.map(([key, v], i) => [padL + i * stepX, yOf(v), key, v]);
+
+  const linePath = points.map((p, i) => (i === 0 ? 'M' : 'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+  const areaPath = linePath + ` L${points[points.length - 1][0].toFixed(1)},${H - padB} L${points[0][0].toFixed(1)},${H - padB} Z`;
+
+  const accent = css('--accent');
+  const ns = 'http://www.w3.org/2000/svg';
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  svg.appendChild(el('line', { x1: padL, y1: H - padB, x2: W - padR, y2: H - padB, stroke: css('--border'), 'stroke-width': 1 }));
+
+  const gradId = 'trendGrad';
+  const defs = el('defs', {});
+  const grad = el('linearGradient', { id: gradId, x1: 0, y1: 0, x2: 0, y2: 1 });
+  grad.appendChild(el('stop', { offset: '0%', 'stop-color': accent, 'stop-opacity': 0.28 }));
+  grad.appendChild(el('stop', { offset: '100%', 'stop-color': accent, 'stop-opacity': 0.02 }));
+  defs.appendChild(grad);
+  svg.appendChild(defs);
+
+  svg.appendChild(el('path', { d: areaPath, fill: `url(#${gradId})`, stroke: 'none' }));
+  svg.appendChild(el('path', { d: linePath, fill: 'none', stroke: accent, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+
+  points.forEach((p, i) => {
+    const isLast = i === points.length - 1;
+    svg.appendChild(el('circle', { cx: p[0], cy: p[1], r: isLast ? 4.5 : 2.6, fill: isLast ? accent : css('--surface'), stroke: accent, 'stroke-width': isLast ? 0 : 1.6 }));
+    if (i % 2 === 0 || isLast) {
+      const t = el('text', { x: p[0], y: H - 8, class: 'axis-label', 'text-anchor': i === 0 ? 'start' : (isLast ? 'end' : 'middle') });
+      t.textContent = fmtMonth(p[2]);
+      svg.appendChild(t);
+    }
+  });
+
+  // hover hit targets
+  points.forEach((p) => {
+    const hit = el('rect', { x: p[0] - stepX / 2, y: padT, width: stepX, height: H - padT - padB, fill: 'transparent', style: 'cursor:pointer' });
+    hit.addEventListener('mousemove', (e) => {
+      const rect = svg.getBoundingClientRect();
+      tooltip.textContent = `${fmtMonth(p[2])} · ${fmt(p[3])} painéis`;
+      tooltip.style.left = ((p[0] / W) * rect.width) + 'px';
+      tooltip.style.top = ((p[1] / H) * rect.height) + 'px';
+      tooltip.classList.add('show');
+    });
+    hit.addEventListener('mouseleave', () => tooltip.classList.remove('show'));
+    svg.appendChild(hit);
+  });
+
+  // --- history callout (2022 bulk-load caveat) ---
+  const y2022 = (DATA.byYear.find(([y]) => y === '2022') || [null, 0])[1];
+  document.getElementById('historyCallout').innerHTML =
+    `<span>ⓘ</span><span><strong>${fmt(y2022)} registros são de 2022</strong> — ${((y2022/DATA.total)*100).toFixed(0)}% da base histórica. Provável carga retroativa de migração, não pico real de captação; não usar 2022 como referência de sazonalidade.</span>`;
+
+  // --- footer ---
+  document.getElementById('footer').innerHTML = `
+    <span>Fonte dos dados: <a href="${DATA.meta.sourceSheetUrl}" target="_blank" rel="noopener">planilha Google Sheets</a> alimentada por query de notebook Databricks. Gerado em ${generated.toLocaleString('pt-BR')}.</span>
+    <span>Este painel mostra apenas dados agregados — nenhum CPF, e-mail, telefone ou nome individual é exibido aqui.</span>
+  `;
+})();
+</script>
