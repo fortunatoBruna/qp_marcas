@@ -1,0 +1,46 @@
+name: Atualizar dados do Painel Quero Pago
+
+on:
+  schedule:
+    # 10:30 UTC = 07:30 America/Sao_Paulo (Brasil nao observa horario de verao)
+    - cron: "30 10 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Baixar CSV da planilha
+        run: |
+          curl -sL --fail "https://docs.google.com/spreadsheets/d/175ofeL64-b0G7hlYKqIBkmyN7aYisozAV72v_qykTAM/export?format=csv" -o sheet.csv
+          test -s sheet.csv
+
+      - name: Parsear CSV
+        run: node 1-parse.cjs sheet.csv parsed.json
+
+      - name: Agregar dados (sem PII)
+        run: node 2-aggregate.cjs parsed.json agg.json
+
+      - name: Checar sanity minimo (rowCount > 0)
+        run: |
+          node -e "const a=require('./agg.json'); if(!a.meta || !(a.meta.rowCount > 0)) { console.error('rowCount invalido:', a.meta && a.meta.rowCount); process.exit(1); }"
+
+      - name: Injetar dados no HTML
+        run: node 3-inject.cjs painel-quero-pago.html agg.json
+
+      - name: Commitar e enviar, se houve mudanca
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- painel-quero-pago.html; then
+            echo "Sem mudanca nos dados, nada a commitar."
+          else
+            git add painel-quero-pago.html
+            git commit -m "chore: atualiza dados do painel ($(date -u +%F))"
+            git push
+          fi
